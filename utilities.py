@@ -2,21 +2,23 @@
 import re, string, calendar
 from wikipedia import WikipediaPage
 from bs4 import BeautifulSoup
+import requests
 
-from typing import List, Match
-
+from typing import List, Match  
 
 def get_page_html(title: str) -> str:
-    """Gets html of a wikipedia page
-
-    Args:
-        title - title of the page
-
-    Returns:
-        html of the page
-    """
-    return WikipediaPage(title).html()
-
+    response = requests.get(
+        "https://en.wikipedia.org/w/api.php&quot;",
+        params={
+            "action": "parse",
+            "page": title,
+            "prop": "text",
+            "format": "json",
+        },
+        headers={"User-Agent": "intro-ai-class/1.0"}
+    )
+    data = response.json()
+    return data["parse"]["text"]["*"]
 
 def get_first_infobox_text(html: str) -> str:
     """Gets first infobox html from a Wikipedia page (summary box)
