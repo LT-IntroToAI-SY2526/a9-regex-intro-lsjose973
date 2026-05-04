@@ -3,12 +3,20 @@ import re, string, calendar
 from wikipedia import WikipediaPage
 from bs4 import BeautifulSoup
 import requests
+from typing import List, Match
 
-from typing import List, Match  
 
 def get_page_html(title: str) -> str:
+    """Gets html of a wikipedia page
+
+    Args:
+        title - title of the page
+
+    Returns:
+        html of the page
+    """
     response = requests.get(
-        "https://en.wikipedia.org/w/api.php&quot;",
+        "https://en.wikipedia.org/w/api.php",
         params={
             "action": "parse",
             "page": title,
@@ -17,8 +25,17 @@ def get_page_html(title: str) -> str:
         },
         headers={"User-Agent": "intro-ai-class/1.0"}
     )
-    data = response.json()
-    return data["parse"]["text"]["*"]
+    # Kept receiving errors with the part below. I had to add the try/except structure to make my code work
+    try:
+        data = response.json()
+        return data["parse"]["text"]["*"]
+    except:
+        page = requests.get(
+            f"https://en.wikipedia.org/wiki/{title}",
+            headers={"User-Agent": "intro-ai-class/1.0"}
+        ).text
+        return page
+
 
 def get_first_infobox_text(html: str) -> str:
     """Gets first infobox html from a Wikipedia page (summary box)
